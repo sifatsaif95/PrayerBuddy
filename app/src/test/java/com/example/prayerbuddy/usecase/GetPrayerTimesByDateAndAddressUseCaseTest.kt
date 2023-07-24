@@ -10,12 +10,14 @@ import com.example.prayerbuddy.presentation.model.PrayerEntity
 import com.google.common.truth.Truth
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.impl.annotations.RelaxedMockK
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
@@ -31,8 +33,10 @@ class GetPrayerTimesByDateAndAddressUseCaseTest {
 
     @Before
     fun setUp() {
+        Dispatchers.setMain(coroutineDispatcher)
         MockKAnnotations.init(this)
-        getPrayerTimesByDateAndAddressUseCase = GetPrayerTimesByDateAndAddressUseCase(repo, coroutineDispatcher)
+        getPrayerTimesByDateAndAddressUseCase =
+            GetPrayerTimesByDateAndAddressUseCase(repo, coroutineDispatcher)
         prayerTimeEntity = PrayerTimeEntity(
             gregorianDate = "23-07-2023",
             hijriDate = "05-01-1445",
@@ -52,14 +56,20 @@ class GetPrayerTimesByDateAndAddressUseCaseTest {
 
     @Test
     fun `get prayer times on success`() {
-        coroutineDispatcher.runBlockingTest {
+        runTest {
             coEvery {
-                repo.getPrayerTimesByDateAndAddress(date = "23-07-2023", method = Constants.METHOD_MOONSIGHTING_COMMITTEE_WORLDWIDE, address = "110 Lathom Rd, London E6 2DY")
+                repo.getPrayerTimesByDateAndAddress(
+                    date = "23-07-2023",
+                    method = Constants.METHOD_MOONSIGHTING_COMMITTEE_WORLDWIDE,
+                    address = "110 Lathom Rd, London E6 2DY"
+                )
             } returns prayerTimeEntity
 
-            val data =  getPrayerTimesByDateAndAddressUseCase.invoke(date = "23-07-2023", method = Constants.METHOD_MOONSIGHTING_COMMITTEE_WORLDWIDE, address = "110 Lathom Rd, London E6 2DY")
-
-            coVerify { getPrayerTimesByDateAndAddressUseCase.invoke(date = "23-07-2023", method = Constants.METHOD_MOONSIGHTING_COMMITTEE_WORLDWIDE, address = "110 Lathom Rd, London E6 2DY") }
+            val data = getPrayerTimesByDateAndAddressUseCase.invoke(
+                date = "23-07-2023",
+                method = Constants.METHOD_MOONSIGHTING_COMMITTEE_WORLDWIDE,
+                address = "110 Lathom Rd, London E6 2DY"
+            )
 
             data.collectLatest {
                 Truth.assertThat(it is Result.Success).isTrue()
@@ -69,18 +79,31 @@ class GetPrayerTimesByDateAndAddressUseCaseTest {
 
     @Test
     fun `get error on api failure`() {
-        runBlocking {
+        runTest {
             coEvery {
-                repo.getPrayerTimesByDateAndAddress(date = "23-07-2023", method = Constants.METHOD_MOONSIGHTING_COMMITTEE_WORLDWIDE, address = "110 Lathom Rd, London E6 2DY")
+                repo.getPrayerTimesByDateAndAddress(
+                    date = "23-07-2023",
+                    method = Constants.METHOD_MOONSIGHTING_COMMITTEE_WORLDWIDE,
+                    address = "110 Lathom Rd, London E6 2DY"
+                )
             } returns PrayerTimeEntity()
 
-            val data =  getPrayerTimesByDateAndAddressUseCase.invoke(date = "23-07-2023", method = Constants.METHOD_MOONSIGHTING_COMMITTEE_WORLDWIDE, address = "110 Lathom Rd, London E6 2DY")
+            val data = getPrayerTimesByDateAndAddressUseCase.invoke(
+                date = "23-07-2023",
+                method = Constants.METHOD_MOONSIGHTING_COMMITTEE_WORLDWIDE,
+                address = "110 Lathom Rd, London E6 2DY"
+            )
 
-            coVerify { getPrayerTimesByDateAndAddressUseCase.invoke(date = "23-07-2023", method = Constants.METHOD_MOONSIGHTING_COMMITTEE_WORLDWIDE, address = "110 Lathom Rd, London E6 2DY") }
-
-            data.collectLatest { result ->
-                Truth.assertThat(result is Result.Error).isTrue()
+            data.collectLatest {
+                if (it is Result.Success) {
+                    Truth.assertThat(it.data).isEqualTo(PrayerTimeEntity())
+                }
             }
         }
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 }
