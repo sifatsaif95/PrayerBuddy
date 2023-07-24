@@ -74,13 +74,13 @@ fun HomeScreen(
                     .padding(16.dp)
             ) {
                 Text(
-                    text = data.value.gregorianDate,
+                    text = data.value.gregorianDate + " Gregorian",
                     color = Color(0xff1d1b20),
                     style = TextStyle(fontSize = 14.sp)
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = data.value.hijriDate,
+                    text =  data.value.hijriDate + " Hijri" ,
                     color = Color(0xff1d1b20),
                     style = TextStyle(fontSize = 14.sp)
                 )
