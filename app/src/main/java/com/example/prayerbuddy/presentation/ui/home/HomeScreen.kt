@@ -3,7 +3,6 @@ package com.example.prayerbuddy.presentation.ui.home
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,8 +29,6 @@ import com.example.prayerbuddy.common.utils.GenericError
 import com.example.prayerbuddy.common.utils.ProgressBar
 import com.example.prayerbuddy.presentation.ui.theme.PrayerBuddyTheme
 import com.example.prayerbuddy.presentation.viewmodel.HomeViewModel
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -46,145 +43,144 @@ fun HomeScreen(
     val currentPrayer = viewModel.currentPrayer.collectAsState()
     val nextPrayer = viewModel.nextPrayer.collectAsState()
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        ProgressBar(
-            isLoading = loading.value,
-            modifier = Modifier
-        )
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(color = Color(0xff2591a9))
+    ) {
 
-        GenericError(
-            errorText = error.value,
-            modifier = Modifier
-        )
-
+        //Date
         Column(
             modifier = modifier
-                .fillMaxSize()
-                .background(color = Color(0xff2591a9))
+                .align(alignment = Alignment.CenterHorizontally)
+                .padding(16.dp)
         ) {
+            Text(
+                text = "Today:",
+                color = Color(0xff1d1b20),
+                style = TextStyle(fontSize = 14.sp)
+            )
 
-            //Date
             Column(
                 modifier = modifier
+                    .padding(top = 8.dp)
+                    .fillMaxWidth()
+                    .clip(shape = RoundedCornerShape(8.dp))
+                    .background(color = Color(0xffcaf5ff))
                     .align(alignment = Alignment.CenterHorizontally)
                     .padding(16.dp)
             ) {
                 Text(
-                    text = "Today:",
+                    text = data.value.gregorianDate,
                     color = Color(0xff1d1b20),
                     style = TextStyle(fontSize = 14.sp)
                 )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = data.value.hijriDate,
+                    color = Color(0xff1d1b20),
+                    style = TextStyle(fontSize = 14.sp)
+                )
+            }
+        }
 
+        //Location
+        Column(
+            modifier = modifier
+                .align(alignment = Alignment.CenterHorizontally)
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "Location:",
+                color = Color(0xff1d1b20),
+                style = TextStyle(fontSize = 14.sp)
+            )
+
+            Column(
+                modifier = modifier
+                    .padding(top = 8.dp)
+                    .fillMaxWidth()
+                    .clip(shape = RoundedCornerShape(8.dp))
+                    .background(color = Color(0xffcaf5ff))
+                    .align(alignment = Alignment.CenterHorizontally)
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = "110 Lathom Road, E6 2DY, London,UK",
+                    color = Color(0xff1d1b20),
+                    style = TextStyle(fontSize = 14.sp)
+                )
+            }
+        }
+
+        //Prayer time
+        Column(
+            modifier = modifier
+                .align(alignment = Alignment.CenterHorizontally)
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "Prayer:",
+                color = Color(0xff1d1b20),
+                style = TextStyle(fontSize = 14.sp)
+            )
+
+            Row(
+                modifier = modifier
+                    .padding(top = 8.dp)
+                    .fillMaxWidth()
+                    .clip(shape = RoundedCornerShape(8.dp))
+                    .background(color = Color(0xffcaf5ff))
+                    .align(alignment = Alignment.CenterHorizontally)
+                    .padding(16.dp)
+            ) {
                 Column(
-                    modifier = modifier
-                        .padding(top = 8.dp)
-                        .fillMaxWidth()
-                        .clip(shape = RoundedCornerShape(8.dp))
-                        .background(color = Color(0xffcaf5ff))
-                        .align(alignment = Alignment.CenterHorizontally)
-                        .padding(16.dp)
+
                 ) {
                     Text(
-                        text = data.value.gregorianDate,
+                        text = Constants.NOW + " " + currentPrayer.value.name,
                         color = Color(0xff1d1b20),
-                        style = TextStyle(fontSize = 14.sp)
+                        style = TextStyle(fontSize = 20.sp)
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = data.value.hijriDate,
+                        text = currentPrayer.value.time,
                         color = Color(0xff1d1b20),
-                        style = TextStyle(fontSize = 14.sp)
+                        style = TextStyle(fontSize = 18.sp)
                     )
                 }
-            }
-
-            //Location
-            Column(
-                modifier = modifier
-                    .align(alignment = Alignment.CenterHorizontally)
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = "Location:",
-                    color = Color(0xff1d1b20),
-                    style = TextStyle(fontSize = 14.sp)
-                )
-
+                Spacer(Modifier.weight(1f))
                 Column(
-                    modifier = modifier
-                        .padding(top = 8.dp)
-                        .fillMaxWidth()
-                        .clip(shape = RoundedCornerShape(8.dp))
-                        .background(color = Color(0xffcaf5ff))
-                        .align(alignment = Alignment.CenterHorizontally)
-                        .padding(16.dp)
+                    horizontalAlignment = Alignment.End
                 ) {
                     Text(
-                        text = "110 Lathom Road, E6 2DY, London,UK",
+                        text = Constants.NEXT + " " + nextPrayer.value.name,
                         color = Color(0xff1d1b20),
-                        style = TextStyle(fontSize = 14.sp)
+                        textAlign = TextAlign.End,
+                        style = TextStyle(fontSize = 20.sp)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = nextPrayer.value.time,
+                        color = Color(0xff1d1b20),
+                        style = TextStyle(fontSize = 18.sp)
                     )
                 }
             }
-
-            //Prayer time
-            Column(
-                modifier = modifier
-                    .align(alignment = Alignment.CenterHorizontally)
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = "Prayer:",
-                    color = Color(0xff1d1b20),
-                    style = TextStyle(fontSize = 14.sp)
-                )
-
-                Row(
-                    modifier = modifier
-                        .padding(top = 8.dp)
-                        .fillMaxWidth()
-                        .clip(shape = RoundedCornerShape(8.dp))
-                        .background(color = Color(0xffcaf5ff))
-                        .align(alignment = Alignment.CenterHorizontally)
-                        .padding(16.dp)
-                ) {
-                    Column(
-
-                    ) {
-                        Text(
-                            text = Constants.NOW + " " + currentPrayer.value.name,
-                            color = Color(0xff1d1b20),
-                            style = TextStyle(fontSize = 20.sp)
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = currentPrayer.value.time,
-                            color = Color(0xff1d1b20),
-                            style = TextStyle(fontSize = 18.sp)
-                        )
-                    }
-                    Spacer(Modifier.weight(1f))
-                    Column(
-                        horizontalAlignment = Alignment.End
-                    ) {
-                        Text(
-                            text = Constants.NEXT + " " + nextPrayer.value.name,
-                            color = Color(0xff1d1b20),
-                            textAlign = TextAlign.End,
-                            style = TextStyle(fontSize = 20.sp)
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = nextPrayer.value.time,
-                            color = Color(0xff1d1b20),
-                            style = TextStyle(fontSize = 18.sp)
-                        )
-                    }
-                }
-            }
-
         }
+
     }
+
+    ProgressBar(
+        isLoading = loading.value,
+        modifier = Modifier
+    )
+
+    GenericError(
+        errorText = error.value,
+        modifier = Modifier
+    )
+
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
