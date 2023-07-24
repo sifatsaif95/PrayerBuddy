@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,11 +55,13 @@ fun HomeScreen(
             modifier = modifier
                 .align(alignment = Alignment.CenterHorizontally)
                 .padding(16.dp)
+                .testTag("date_column_test_tag")
         ) {
             Text(
                 text = "Today:",
                 color = Color(0xff1d1b20),
-                style = TextStyle(fontSize = 14.sp)
+                style = TextStyle(fontSize = 14.sp),
+                modifier = Modifier.testTag("date_label_test_tag")
             )
 
             Column(
@@ -89,11 +92,13 @@ fun HomeScreen(
             modifier = modifier
                 .align(alignment = Alignment.CenterHorizontally)
                 .padding(16.dp)
+                .testTag("location_column_test_tag")
         ) {
             Text(
                 text = "Location:",
                 color = Color(0xff1d1b20),
-                style = TextStyle(fontSize = 14.sp)
+                style = TextStyle(fontSize = 14.sp),
+                modifier = Modifier.testTag("location_label_test_tag")
             )
 
             Column(
@@ -118,11 +123,13 @@ fun HomeScreen(
             modifier = modifier
                 .align(alignment = Alignment.CenterHorizontally)
                 .padding(16.dp)
+                .testTag("prayer_time_column_test_tag")
         ) {
             Text(
                 text = "Prayer:",
                 color = Color(0xff1d1b20),
-                style = TextStyle(fontSize = 14.sp)
+                style = TextStyle(fontSize = 14.sp),
+                modifier = Modifier.testTag("prayer_time_label_test_tag")
             )
 
             Row(

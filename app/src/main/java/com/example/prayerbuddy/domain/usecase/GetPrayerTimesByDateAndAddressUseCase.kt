@@ -14,10 +14,13 @@ class GetPrayerTimesByDateAndAddressUseCase @Inject constructor(
     private val repository: Repository,
     private val dispatcher: CoroutineDispatcher
 ) {
-    suspend operator fun invoke(date: String, address: String, method: Int): Flow<Result<PrayerTimeEntity>> {
-        val response = repository.getPrayerTimesByDateAndAddress(date, address, method)
+    suspend operator fun invoke(
+        date: String,
+        address: String,
+        method: Int
+    ): Flow<Result<PrayerTimeEntity>> {
         return flowResourceUseCase {
-            PrayerTimeMapper().toPrayerEntity(response)
+            repository.getPrayerTimesByDateAndAddress(date, address, method)
         }.flowOn(dispatcher)
     }
 }
