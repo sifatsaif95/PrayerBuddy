@@ -2,6 +2,7 @@ package com.example.prayerbuddy.presentation.viewmodel
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.prayerbuddy.common.utils.Constants.METHOD_MOONSIGHTING_COMMITTEE_WORLDWIDE
@@ -40,11 +41,9 @@ class HomeViewModel @Inject constructor(
     private val _nextPrayer = MutableStateFlow(PrayerEntity())
     var nextPrayer: MutableStateFlow<PrayerEntity> = _nextPrayer
 
-    fun getPrayerTimes() = viewModelScope.launch {
-        val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
-        val currentDate: String = LocalDate.now().format(formatter)
-
-        getPrayerTimesByDateAndAddressUseCase.invoke(date = currentDate, method = METHOD_MOONSIGHTING_COMMITTEE_WORLDWIDE, address = "110 Lathom Rd, London E6 2DY").collectLatest {
+    @VisibleForTesting
+    internal fun getPrayerTimes( date: String, method: Int, address: String) = viewModelScope.launch {
+        getPrayerTimesByDateAndAddressUseCase.invoke(date = date, method = method, address = address).collectLatest {
             when(it) {
                 is Result.Loading -> {
                     _loading.value = true
@@ -91,6 +90,8 @@ class HomeViewModel @Inject constructor(
     }
 
     init {
-        getPrayerTimes()
+        val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+        val currentDate: String = LocalDate.now().format(formatter)
+        getPrayerTimes(date = currentDate, method = METHOD_MOONSIGHTING_COMMITTEE_WORLDWIDE, address = "110 Lathom Rd, London E6 2DY")
     }
 }

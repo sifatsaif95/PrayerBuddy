@@ -25,16 +25,16 @@ import org.junit.Test
 import org.junit.rules.TestRule
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class HomeViewMdelTest {
+class HomeViewModelTest {
 
     @get:Rule
     private val instantTaskExecutorRule: TestRule = InstantTaskExecutorRule()
 
     val dispatcher = TestCoroutineDispatcher()
 
-    private lateinit var prayerTimeEntity: PrayerTimeEntity
-
     private lateinit var viewmodel: HomeViewModel
+
+    private lateinit var prayerTimeEntity: PrayerTimeEntity
 
     @RelaxedMockK
     private lateinit var getPrayerTimesByDateAndAddressUseCase: GetPrayerTimesByDateAndAddressUseCase
@@ -74,7 +74,9 @@ class HomeViewMdelTest {
                 emit(Result.Loading)
             }
 
-            viewmodel.getPrayerTimes()
+            viewmodel.getPrayerTimes(date = "23-07-2023",
+                method = Constants.METHOD_MOONSIGHTING_COMMITTEE_WORLDWIDE,
+                address = "110 Lathom Rd, London E6 2DY")
 
             Truth.assertThat(viewmodel.loading.value).isTrue()
             assertEquals(viewmodel.data.value.gregorianDate, "")
@@ -96,9 +98,12 @@ class HomeViewMdelTest {
                 emit(Result.Success(prayerTimeEntity))
             }
 
-            viewmodel.getPrayerTimes()
+            viewmodel.getPrayerTimes(date = "23-07-2023",
+                method = Constants.METHOD_MOONSIGHTING_COMMITTEE_WORLDWIDE,
+                address = "110 Lathom Rd, London E6 2DY")
 
             assertEquals(viewmodel.data.value, prayerTimeEntity)
+            Truth.assertThat(viewmodel.loading.value).isFalse()
         }
     }
 
@@ -115,9 +120,11 @@ class HomeViewMdelTest {
                 emit(Result.Error("Generic error"))
             }
 
-            viewmodel.getPrayerTimes()
+            viewmodel.getPrayerTimes(date = "23-07-2023",
+                method = Constants.METHOD_MOONSIGHTING_COMMITTEE_WORLDWIDE,
+                address = "110 Lathom Rd, London E6 2DY")
 
-            assertEquals(viewmodel.error.value, "")
+            assertEquals(viewmodel.error.value, "Generic error")
             assertEquals(viewmodel.data.value.gregorianDate, "")
             assertEquals(viewmodel.data.value.asr.time, "")
             assertEquals(viewmodel.data.value.isha.time, "")
